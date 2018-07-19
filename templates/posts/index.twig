@@ -1,0 +1,18 @@
+{% extends "layout.twig" %}
+
+{% block content %}
+    <!-- Begin page content -->
+    <main role="main" class="container" style="padding-top: 60px;">
+        <h1 class="mt-5">Migration démo</h1>
+        <p class="lead">Pin a fixed-height footer to the bottom of the viewport in desktop browsers with this custom HTML and CSS. A fixed navbar has been added with <code>padding-top: 60px;</code> on the <code>body &gt; .container</code>.</p>
+        <p>Back to <a href="../sticky-footer">the default sticky footer</a> minus the navbar.</p>
+
+        <h2 class="mt-5">Tous articles</h2>
+
+        <ul>
+            {% for post in posts %}
+                <li><a href="{{ path_for('posts.view', {slug: post.slug}) }}">{{ post.name }}</a></li>
+            {% endfor %}
+        </ul>
+    </main>
+{% endblock %}

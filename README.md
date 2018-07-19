@@ -1,6 +1,6 @@
 # Migration-demo 
 
-Une petite application démo d'utilisateur de la librairie "TuxBoy/Migration" [Voir le dépôt du projet](https://github.com/TuxBoy/Migration).
+Une petite application démo d'utilisation de la librairie "TuxBoy/Migration" [Voir le dépôt du projet](https://github.com/TuxBoy/Migration).
 
 ## Installation
 

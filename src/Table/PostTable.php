@@ -54,4 +54,14 @@ class PostTable
         return $statement->fetch() ?: null;
     }
 
+    /**
+     * @param array $data
+     * @return int
+     * @throws \Doctrine\DBAL\DBALException
+     */
+    public function save(array $data = []): int
+    {
+        return $this->db->insert('posts', $data);
+    }
+
 }

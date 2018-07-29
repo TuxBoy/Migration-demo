@@ -1,16 +1,14 @@
 <?php
 namespace App\Controller;
 
-use App\Entity\Post;
 use App\Table\PostTable;
-use Doctrine\DBAL\Connection;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Slim\Exception\NotFoundException;
 use Slim\Http\Request;
 use Slim\Http\Response;
+use Slim\Interfaces\RouterInterface;
 use Slim\Views\Twig;
-use function Sodium\compare;
 
 class PostController
 {
@@ -40,6 +38,20 @@ class PostController
     {
         $posts = $this->postTable->getAll();
         return $this->render($response, 'posts.index', compact('posts'));
+    }
+
+    /**
+     * @param Request $request
+     * @param Response $response
+     * @return Response
+     * @throws \Doctrine\DBAL\DBALException
+     */
+    public function addPost(Request $request, Response $response)
+    {
+        $this->postTable->save($request->getParams());
+        /** @var $router RouterInterface */
+        $router = $this->container->get('router');
+        return $response->withRedirect($router->pathFor('posts.index'));
     }
 
     /**

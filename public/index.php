@@ -24,20 +24,25 @@ $container['view'] = function ($container) {
     return $view;
 };
 
-$container['db'] = function () {
-    return \Doctrine\DBAL\DriverManager::getConnection([
-        'dbname'   => 'automigrate',
+$config = [
+    'database' => [
+        'dbname'   => 'demo',
         'user'     => 'root',
         'password' => 'root',
         'host'     => 'localhost',
         'driver'   => 'pdo_mysql',
-    ]);
+    ]
+];
+
+$container['db'] = function () use ($config) {
+    return \Doctrine\DBAL\DriverManager::getConnection($config['database']);
 };
 
 $app->add(new \Zeuxisoo\Whoops\Provider\Slim\WhoopsMiddleware($app));
-$app->add(new \TuxBoy\Middleware\MaintainerMiddleware([\App\Entity\Post::class, \App\Entity\Category::class]));
+$app->add(new \SDAM\Middleware\MaintainerMiddleware([\App\Entity\Post::class, \App\Entity\Category::class], $config));
 
-$app->get('/posts', \App\Controller\PostController::class . ':index');
+$app->get('/posts', \App\Controller\PostController::class . ':index')->setName('posts.index');
+$app->post('/posts', \App\Controller\PostController::class . ':addPost');
 $app->get('/post/{slug}', \App\Controller\PostController::class . ':view')->setName('posts.view');
 
 // Run app

@@ -14,5 +14,18 @@
                 <li><a href="{{ path_for('posts.view', {slug: post.slug}) }}">{{ post.name }}</a></li>
             {% endfor %}
         </ul>
+
+        <hr>
+
+        <h3>Ajouter un article</h3>
+        <form action="{{ path_for('posts.index') }}" method="post">
+            <div class="form-group"><input type="text" class="form-control" name="name" placeholder="Titre"></div>
+            <div class="form-group"><input type="text" class="form-control" name="slug" placeholder="URL"></div>
+            <div class="group">
+                <textarea name="content" id="content" class="form-control" placeholder="Contenu"></textarea>
+            </div>
+            <div class="form-group"><input type="checkbox" name="online" class="form-group"> En ligne ?</div>
+            <button class="btn btn-primary" type="submit">Ajouter</button>
+        </form>
     </main>
 {% endblock %}

@@ -17,7 +17,7 @@
         }
     },
     "require": {
-        "tuxboy/migration": "dev-master",
+        "tuxboy/sdam": "dev-master",
         "slim/slim": "^3.10",
         "slim/twig-view": "^2.4",
         "doctrine/dbal": "^2.8"
@@ -25,7 +25,7 @@
     "repositories": [
         {
             "type": "vcs",
-            "url":  "git@github.com:tuxboy/migration.git"
+            "url":  "git@github.com:tuxboy/sdam.git"
         }
     ],
     "require-dev": {

@@ -26,12 +26,13 @@ $container['view'] = function ($container) {
 
 $config = [
     'database' => [
-        'dbname'   => 'demo',
+        'dbname'   => 'sdam_demo',
         'user'     => 'root',
         'password' => 'root',
         'host'     => 'localhost',
         'driver'   => 'pdo_mysql',
-    ]
+    ],
+	\SDAM\Config::ENV_FILE => dirname(__DIR__)
 ];
 
 $container['db'] = function () use ($config) {

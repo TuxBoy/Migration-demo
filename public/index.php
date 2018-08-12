@@ -32,7 +32,8 @@ $config = [
         'host'     => 'localhost',
         'driver'   => 'pdo_mysql',
     ],
-	\SDAM\Config::ENV_FILE => dirname(__DIR__)
+	\SDAM\Config::ENV_FILE    => dirname(__DIR__),
+	\SDAM\Config::ENTITY_PATH => 'App\\Entity'
 ];
 
 $container['db'] = function () use ($config) {
@@ -40,7 +41,7 @@ $container['db'] = function () use ($config) {
 };
 
 $app->add(new \Zeuxisoo\Whoops\Provider\Slim\WhoopsMiddleware($app));
-$app->add(new \SDAM\Middleware\MaintainerMiddleware([\App\Entity\Post::class, \App\Entity\Category::class], $config));
+$app->add(new \SDAM\Middleware\MaintainerMiddleware(new SDAM\EntityAdapter\EntityAdapter(PROJECT_ROOT . 'src/Entity'), $config));
 
 $app->get('/posts', \App\Controller\PostController::class . ':index')->setName('posts.index');
 $app->post('/posts', \App\Controller\PostController::class . ':addPost');

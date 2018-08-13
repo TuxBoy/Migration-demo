@@ -23,6 +23,12 @@ class PostController
      */
     private $postTable;
 
+	/**
+	 * PostController constructor.
+	 * @param ContainerInterface $container
+	 * @throws \PhpDocReader\AnnotationException
+	 * @throws \ReflectionException
+	 */
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
@@ -46,7 +52,7 @@ class PostController
      * @return Response
      * @throws \Doctrine\DBAL\DBALException
      */
-    public function addPost(Request $request, Response $response)
+    public function addPost(Request $request, Response $response): ResponseInterface
     {
         $this->postTable->save($request->getParams());
         /** @var $router RouterInterface */

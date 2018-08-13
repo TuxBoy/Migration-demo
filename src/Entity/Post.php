@@ -1,5 +1,7 @@
 <?php
 namespace App\Entity;
+
+use Cocur\Slugify\Slugify;
 use SDAM\Traits\HasTimestamp;
 
 /**
@@ -32,14 +34,29 @@ class Post
     public $online = true;
 
     /**
-     * @var integer
-     */
-    public $post_count;
-
-    /**
      * @link belongsTo
      * @var Category
      */
     public $category;
+
+	/**
+	 * @link belongsToMany
+	 * @var Tag[]
+	 */
+    public $tags;
+
+	/**
+	 * @param string|null $slug
+	 * @return Post
+	 */
+	public function setSlug(?string $slug): self
+	{
+		if (is_null($slug)) {
+			$this->slug = (new Slugify())->slugify($this->name);
+		} else {
+			$this->slug = $slug;
+		}
+		return $this;
+	}
 
 }

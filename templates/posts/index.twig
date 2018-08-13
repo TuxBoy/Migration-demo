@@ -11,7 +11,14 @@
 
         <ul>
             {% for post in posts %}
-                <li><a href="{{ path_for('posts.view', {slug: post.slug}) }}">{{ post.name }}</a></li>
+                <li><a href="{{ path_for('posts.view', {slug: post.slug}) }}">{{ post.name }}
+                        {% for tag in post.tags %}
+                        <span class="badge badge-success">
+                            {{ tag.name }}
+                        </span>
+                        {% endfor %}
+                    </a>
+                </li>
             {% endfor %}
         </ul>
 
@@ -21,9 +28,10 @@
         <form action="{{ path_for('posts.index') }}" method="post">
             <div class="form-group"><input type="text" class="form-control" name="name" placeholder="Titre"></div>
             <div class="form-group"><input type="text" class="form-control" name="slug" placeholder="URL"></div>
-            <div class="group">
+            <div class="form-group">
                 <textarea name="content" id="content" class="form-control" placeholder="Contenu"></textarea>
             </div>
+            <div class="form-group"><input class="form-control" type="text" name="tag" placeholder="Tags"></div>
             <div class="form-group"><input type="checkbox" name="online" class="form-group"> En ligne ?</div>
             <button class="btn btn-primary" type="submit">Ajouter</button>
         </form>

@@ -2,66 +2,95 @@
 namespace App\Table;
 
 use App\Entity\Post;
-use Doctrine\DBAL\Connection;
+use App\Entity\Tag;
 use PDO;
 
-class PostTable
+/**
+ * Class PostTable
+ * @package App\Table
+ */
+class PostTable extends Table
 {
 
-    /**
-     * @var Connection
-     */
-    private $db;
+	protected $entity = Post::class;
 
-    /**
-     * PostTable constructor
-     *
-     * @param Connection $db
-     */
-    public function __construct(Connection $db)
-    {
-        $this->db = $db;
-    }
+	/**
+	 * @param string $alias
+	 * @return array
+	 */
+	public function getAll(string $alias = 't'): array
+	{
+		$posts = parent::getAll('p');
+		foreach ($posts as $post) {
+			if (!empty($this->findTags($post->id))) {
+				$post->tags = $this->findTags($post->id);
+			}
+		}
+		return $posts;
+	}
 
-    /**
-     * Get all posts
-     *
-     * @return Post[]
-     */
-    public function getAll(): array
-    {
-        $statement = $this->db->createQueryBuilder()
-            ->select('*')
-            ->from('posts', 'p')
-            ->execute();
-        $statement->setFetchMode(PDO::FETCH_CLASS, Post::class);
-        return $statement->fetchAll();
-    }
+	public function findTags(int $post_id): array
+	{
+		$statement = $this->db->createQueryBuilder()
+			->select('t.*')
+			->from('tags', 't')
+			->innerJoin('t', 'posts_tags', 'pt', 'pt.tag_id = t.id')
+			->where('pt.post_id = ?')
+			->setParameter(0, $post_id)
+			->execute();
+		$statement->setFetchMode(PDO::FETCH_CLASS, Tag::class);
+		return $statement->fetchAll();
+	}
 
-    /**
-     * @param string $slug
-     * @return Post
-     */
-    public function findBySlug(string $slug): ?Post
-    {
-        $statement = $this->db->createQueryBuilder()
-            ->select('*')
-            ->from('posts', 'p')
-            ->where('p.slug = ?')
-            ->setParameter(0, $slug)
-            ->execute();
-        $statement->setFetchMode(PDO::FETCH_CLASS, Post::class);
-        return $statement->fetch() ?: null;
-    }
-
-    /**
-     * @param array $data
-     * @return int
-     * @throws \Doctrine\DBAL\DBALException
-     */
+	/**
+	 * @param array $data
+	 * @return int
+	 * @throws \Doctrine\DBAL\DBALException
+	 * @throws \PhpDocReader\AnnotationException
+	 * @throws \ReflectionException
+	 */
     public function save(array $data = []): int
     {
-        return $this->db->insert('posts', $data);
+    	$tags = [];
+		if (isset($data['tag'])) {
+			$tags = $data['tag'];
+			unset($data['tag']);
+		}
+        $this->db->insert('posts', $data);
+		$lastIdPost = $this->db->lastInsertId();
+		if ($lastIdPost && !empty($tags)) {
+			$this->saveTags($tags, $lastIdPost);
+		}
+        return $lastIdPost;
     }
+
+	/**
+	 * @param string $tags
+	 * @param int $lastPostId
+	 * @return PostTable
+	 * @throws \Doctrine\DBAL\DBALException
+	 * @throws \PhpDocReader\AnnotationException
+	 * @throws \ReflectionException
+	 */
+	public function saveTags(string $tags, int $lastPostId): self
+	{
+		$tagTable    = new TagTable($this->db);
+		$tagsInTable = [];
+		foreach ($tagTable->getAll() as $tag) {
+			$tagsInTable[$tag->name] = $tag->slug;
+		}
+		$tags = explode(',', $tags);
+		$tags = array_filter($tags);
+		foreach ($tags as $tag) {
+			$lastIdTag = null;
+			if (!array_key_exists($tag, $tagsInTable)) {
+				$lastIdTag = $tagTable->save($tag);
+			} else {
+				$lastIdTag = $tagTable->findBySlug($tagsInTable[$tag])->id;
+			}
+			$tagTable->insertPostTag($lastPostId, $lastIdTag);
+		}
+		return $this;
+	}
 
 }
